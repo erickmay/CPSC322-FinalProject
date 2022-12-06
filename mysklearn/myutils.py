@@ -106,6 +106,102 @@ def determine_loc(given_loc):
     else:
         return "H"
 
+def discretize_fgs(fg, fga, fgp):
+    fg_d = ""
+    fga_d = ""
+    fgp_d = ""
+    if fg >= 35:
+        fg_d = "High"
+    elif fg >= 25:
+        fg_d = "Average"
+    else:
+        fg_d = "Low"
+    if fga >= 70:
+        fga_d = "High"
+    elif fga >= 55:
+        fga_d = "Average"
+    else:
+        fga_d = "Low"
+    if fgp >= 0.55:
+        fgp_d = "High"
+    elif fgp >= 0.5:
+        fgp_d = "Average"
+    else:
+        fgp_d = "Low"
+    return fg_d, fga_d, fgp_d
+
+def discretize_twos(two, twoa, twop):
+    two_d = ""
+    twoa_d = ""
+    twop_d = ""
+    if two >= 30:
+        two_d = "High"
+    elif two >= 20:
+        two_d = "Average"
+    else:
+        two_d = "Low"
+    if twoa >= 45:
+        twoa_d = "High"
+    elif twoa >= 30:
+        twoa_d = "Average"
+    else:
+        twoa_d = "Low"
+    if twop >= 0.6:
+        twop_d = "High"
+    elif twop >= 0.5:
+        twop_d = "Average"
+    else:
+        twop_d = "Low"
+    return two_d, twoa_d, twop_d
+
+def discretize_threes(three, threea, threep):
+    three_d = ""
+    threea_d = ""
+    threep_d = ""
+    if three >= 10:
+        three_d = "High"
+    elif three >= 6:
+        three_d = "Average"
+    else:
+        three_d = "Low"
+    if threea >= 25:
+        threea_d = "High"
+    elif threea >= 15:
+        threea_d = "Average"
+    else:
+        threea_d = "Low"
+    if threep >= 0.4:
+        threep_d = "High"
+    elif threep >= 0.3:
+        threep_d = "Average"
+    else:
+        threep_d = "Low"
+    return three_d, threea_d, threep_d
+
+def discretize_fts(ft, fta, ftp):
+    ft_d = ""
+    fta_d = ""
+    ftp_d = ""
+    if ft >= 15:
+        ft_d = "High"
+    elif ft >= 10:
+        ft_d = "Average"
+    else:
+        ft_d = "Low"
+    if fta >= 25:
+        fta_d = "High"
+    elif fta >= 15:
+        fta_d = "Average"
+    else:
+        fta_d = "Low"
+    if ftp >= 0.8:
+        ftp_d = "High"
+    elif ftp >= 0.6:
+        ftp_d = "Average"
+    else:
+       ftp_d = "Low"
+    return ft_d, fta_d, ftp_d
+
 def find_accuracy(y_predicted, y_test):
     correct_preds = 0
     for i in range(0, len(y_test)):
