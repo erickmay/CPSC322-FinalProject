@@ -249,3 +249,9 @@ def get_unique_col_vals(col):
             unique_col_vals.append(val)
 
     return unique_col_vals
+
+def get_col(table, index):
+    col = []
+    for row in table:
+        col.append(row[index])
+    return col

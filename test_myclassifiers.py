@@ -1,8 +1,10 @@
 import numpy as np
 from scipy import stats
 from mysklearn.myclassifiers import MyNaiveBayesClassifier, \
-    MyKNeighborsClassifier,\
+    MyKNeighborsClassifier, MyRandomForestClassifier, MyDecisionTreeWithF, \
     MyDummyClassifier, MyDecisionTreeClassifier
+import mysklearn.myevaluation as myevaluation
+import mysklearn.myutils as myutils
 
 def test_kneighbors_classifier_kneighbors():
     knn_clf1 = MyKNeighborsClassifier(3)
@@ -529,3 +531,158 @@ def test_decision_tree_classifier_predict():
     tree_clf2.fit(X_train_iphone, y_train_iphone)
     y_predicted = tree_clf2.predict([[2, 2, "fair"], [1, 1, "excellent"]])
     assert y_predicted == ["yes", "yes"]
+
+def test_random_forest_fit():
+    forest_clf1 = MyRandomForestClassifier(8, 5, 8)
+    # interview dataset
+    header_interview = ["level", "lang", "tweets", "phd", "interviewed_well"]
+    X_train_interview = [
+        ["Senior", "Java", "no", "no"],
+        ["Senior", "Java", "no", "yes"],
+        ["Mid", "Python", "no", "no"],
+        ["Junior", "Python", "no", "no"],
+        ["Junior", "R", "yes", "no"],
+        ["Junior", "R", "yes", "yes"],
+        ["Mid", "R", "yes", "yes"],
+        ["Senior", "Python", "no", "no"],
+        ["Senior", "R", "yes", "no"],
+        ["Junior", "Python", "yes", "no"],
+        ["Senior", "Python", "yes", "yes"],
+        ["Mid", "Python", "no", "yes"],
+        ["Mid", "Java", "yes", "no"],
+        ["Junior", "Python", "no", "yes"]
+    ]
+    y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+    X_remainder, X_test, y_remainder, y_test = myevaluation.bootstrap_sample(X_train_interview, y_train_interview, len(X_train_interview), 0)
+    X_train1, X_val1, y_train1, y_val1 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 1)
+    X_train2, X_val2, y_train2, y_val2 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 2)
+    X_train3, X_val3, y_train3, y_val3 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 3)
+    X_train4, X_val4, y_train4, y_val4 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 4)
+    X_train5, X_val5, y_train5, y_val5 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 5)
+    X_train6, X_val6, y_train6, y_val6 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 6)
+    X_train7, X_val7, y_train7, y_val7 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 7)
+    X_train8, X_val8, y_train8, y_val8 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 8)
+    tree_clf1 = MyDecisionTreeWithF(8, 1)
+    tree_clf2 = MyDecisionTreeWithF(8, 2)
+    tree_clf3 = MyDecisionTreeWithF(8, 3)
+    tree_clf4 = MyDecisionTreeWithF(8, 4)
+    tree_clf5 = MyDecisionTreeWithF(8, 5)
+    tree_clf6 = MyDecisionTreeWithF(8, 6)
+    tree_clf7 = MyDecisionTreeWithF(8, 7)
+    tree_clf8 = MyDecisionTreeWithF(8, 8)
+    tree_clf1.fit(X_train1, y_train1)
+    tree_clf2.fit(X_train2, y_train2)
+    tree_clf3.fit(X_train3, y_train3)
+    tree_clf4.fit(X_train4, y_train4)
+    tree_clf5.fit(X_train5, y_train5)
+    tree_clf6.fit(X_train6, y_train6)
+    tree_clf7.fit(X_train7, y_train7)
+    tree_clf8.fit(X_train8, y_train8)
+    y_pred1 = tree_clf1.predict(X_val1)
+    y_pred2 = tree_clf2.predict(X_val2)
+    y_pred3 = tree_clf3.predict(X_val3)
+    y_pred4 = tree_clf4.predict(X_val4)
+    y_pred5 = tree_clf5.predict(X_val5)
+    y_pred6 = tree_clf6.predict(X_val6)
+    y_pred7 = tree_clf7.predict(X_val7)
+    y_pred8 = tree_clf8.predict(X_val8)
+    acc1 = myevaluation.accuracy_score(y_val1, y_pred1)
+    acc2 = myevaluation.accuracy_score(y_val2, y_pred2)
+    acc3 = myevaluation.accuracy_score(y_val3, y_pred3)
+    acc4 = myevaluation.accuracy_score(y_val4, y_pred4)
+    acc5 = myevaluation.accuracy_score(y_val5, y_pred5)
+    acc6 = myevaluation.accuracy_score(y_val6, y_pred6)
+    acc7 = myevaluation.accuracy_score(y_val7, y_pred7)
+    acc8 = myevaluation.accuracy_score(y_val8, y_pred8)
+    accuracies = [acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8]
+    trees = [tree_clf1.tree, tree_clf2.tree, tree_clf3.tree, tree_clf4.tree, tree_clf5.tree, tree_clf6.tree, tree_clf7.tree, tree_clf8.tree]
+    for i in range(0, 3):
+        index_to_remove = accuracies.index(min(accuracies))
+        accuracies.remove(min(accuracies))
+        trees.remove(trees[index_to_remove])
+    forest_clf1.fit(X_remainder, y_remainder)
+    assert forest_clf1.trees == trees
+
+
+def test_random_forest_predict():
+    forest_clf1 = MyRandomForestClassifier(8, 5, 8)
+    # interview dataset
+    header_interview = ["level", "lang", "tweets", "phd", "interviewed_well"]
+    X_train_interview = [
+        ["Senior", "Java", "no", "no"],
+        ["Senior", "Java", "no", "yes"],
+        ["Mid", "Python", "no", "no"],
+        ["Junior", "Python", "no", "no"],
+        ["Junior", "R", "yes", "no"],
+        ["Junior", "R", "yes", "yes"],
+        ["Mid", "R", "yes", "yes"],
+        ["Senior", "Python", "no", "no"],
+        ["Senior", "R", "yes", "no"],
+        ["Junior", "Python", "yes", "no"],
+        ["Senior", "Python", "yes", "yes"],
+        ["Mid", "Python", "no", "yes"],
+        ["Mid", "Java", "yes", "no"],
+        ["Junior", "Python", "no", "yes"]
+    ]
+    y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+    X_remainder, X_test, y_remainder, y_test = myevaluation.bootstrap_sample(X_train_interview, y_train_interview, len(X_train_interview), 0)
+    X_train1, X_val1, y_train1, y_val1 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 1)
+    X_train2, X_val2, y_train2, y_val2 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 2)
+    X_train3, X_val3, y_train3, y_val3 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 3)
+    X_train4, X_val4, y_train4, y_val4 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 4)
+    X_train5, X_val5, y_train5, y_val5 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 5)
+    X_train6, X_val6, y_train6, y_val6 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 6)
+    X_train7, X_val7, y_train7, y_val7 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 7)
+    X_train8, X_val8, y_train8, y_val8 = myevaluation.bootstrap_sample(X_remainder, y_remainder, len(X_remainder), 8)
+    tree_clf1 = MyDecisionTreeWithF(8, 1)
+    tree_clf2 = MyDecisionTreeWithF(8, 2)
+    tree_clf3 = MyDecisionTreeWithF(8, 3)
+    tree_clf4 = MyDecisionTreeWithF(8, 4)
+    tree_clf5 = MyDecisionTreeWithF(8, 5)
+    tree_clf6 = MyDecisionTreeWithF(8, 6)
+    tree_clf7 = MyDecisionTreeWithF(8, 7)
+    tree_clf8 = MyDecisionTreeWithF(8, 8)
+    tree_clf1.fit(X_train1, y_train1)
+    tree_clf2.fit(X_train2, y_train2)
+    tree_clf3.fit(X_train3, y_train3)
+    tree_clf4.fit(X_train4, y_train4)
+    tree_clf5.fit(X_train5, y_train5)
+    tree_clf6.fit(X_train6, y_train6)
+    tree_clf7.fit(X_train7, y_train7)
+    tree_clf8.fit(X_train8, y_train8)
+    y_pred1 = tree_clf1.predict(X_val1)
+    y_pred2 = tree_clf2.predict(X_val2)
+    y_pred3 = tree_clf3.predict(X_val3)
+    y_pred4 = tree_clf4.predict(X_val4)
+    y_pred5 = tree_clf5.predict(X_val5)
+    y_pred6 = tree_clf6.predict(X_val6)
+    y_pred7 = tree_clf7.predict(X_val7)
+    y_pred8 = tree_clf8.predict(X_val8)
+    acc1 = myevaluation.accuracy_score(y_val1, y_pred1)
+    acc2 = myevaluation.accuracy_score(y_val2, y_pred2)
+    acc3 = myevaluation.accuracy_score(y_val3, y_pred3)
+    acc4 = myevaluation.accuracy_score(y_val4, y_pred4)
+    acc5 = myevaluation.accuracy_score(y_val5, y_pred5)
+    acc6 = myevaluation.accuracy_score(y_val6, y_pred6)
+    acc7 = myevaluation.accuracy_score(y_val7, y_pred7)
+    acc8 = myevaluation.accuracy_score(y_val8, y_pred8)
+    accuracies = [acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8]
+    trees = [tree_clf1.tree, tree_clf2.tree, tree_clf3.tree, tree_clf4.tree, tree_clf5.tree, tree_clf6.tree, tree_clf7.tree, tree_clf8.tree]
+    tree_clfs = [tree_clf1, tree_clf2, tree_clf3, tree_clf4, tree_clf5, tree_clf6, tree_clf7, tree_clf8]
+    for i in range(0, 3):
+        index_to_remove = accuracies.index(min(accuracies))
+        accuracies.remove(min(accuracies))
+        trees.remove(trees[index_to_remove])
+        tree_clfs.remove(tree_clfs[index_to_remove])
+    forest_clf1.fit(X_remainder, y_remainder)
+    ovr_y_pred = []
+    for row in X_test:
+        y_pred_list = []
+        for clf in tree_clfs:
+            y_pred = clf.predict(row)
+            y_pred_list.append(y_pred)
+        vals, val_counts = myutils.find_col_frequencies(y_pred_list)
+        winner = myutils.find_most_frequent_col_val(vals, val_counts)
+        ovr_y_pred.append(winner)
+    y_predicted = forest_clf1.predict(y_test)
+    assert y_predicted == ovr_y_pred
